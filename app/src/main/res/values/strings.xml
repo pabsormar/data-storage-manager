@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">DataStorageManager</string>
+    <string name="app_name">Data Storage Manager</string>
     <string name="default_text">Hello World!</string>
     <string name="hint_text">Write something...</string>
     <string name="btn_internal_storage_text">Save data on internal file</string>
