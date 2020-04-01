@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.room.Entity;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -41,6 +42,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         final Button btnInternalStorage = findViewById(R.id.btnInternalStorage);
         btnInternalStorage.setOnClickListener(this);
+
+        final Button btnDb = findViewById(R.id.btnDataBase);
+        btnDb.setOnClickListener(this);
 
         final Button btnOk = findViewById(R.id.btnOk);
         btnOk.setOnClickListener(this);
@@ -82,6 +86,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btnExternalStorage:
                 checkExternalStorageWritePermission();
                 break;
+            case R.id.btnDataBase:
+                createDatabaseAndTableIfNotAvailable();
+                break;
             default:
                 Log.w("switch", "No 'case' matched");
         }
@@ -98,6 +105,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Toast.makeText(this, "External storage usage not granted", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private void createDatabaseAndTableIfNotAvailable() {
+
     }
 
     private void checkExternalStorageWritePermission() {
