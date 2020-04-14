@@ -1,4 +1,4 @@
-package org.deafsapps.android.datastoragemanager;
+package org.deafsapps.android.datastoragemanager.view;
 
 import android.Manifest;
 import android.content.SharedPreferences;
@@ -16,11 +16,18 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.room.Entity;
+import androidx.room.Room;
+
+import org.deafsapps.android.datastoragemanager.R;
+import org.deafsapps.android.datastoragemanager.data.StudentEntity;
+import org.deafsapps.android.datastoragemanager.db.MdsdDb;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -41,6 +48,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         final Button btnInternalStorage = findViewById(R.id.btnInternalStorage);
         btnInternalStorage.setOnClickListener(this);
+
+        final Button btnDb = findViewById(R.id.btnDataBase);
+        btnDb.setOnClickListener(this);
 
         final Button btnOk = findViewById(R.id.btnOk);
         btnOk.setOnClickListener(this);
@@ -82,6 +92,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btnExternalStorage:
                 checkExternalStorageWritePermission();
                 break;
+            case R.id.btnDataBase:
+                createDatabaseAndTableIfNotAvailable();
+                break;
             default:
                 Log.w("switch", "No 'case' matched");
         }
@@ -98,6 +111,33 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Toast.makeText(this, "External storage usage not granted", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private void createDatabaseAndTableIfNotAvailable() {
+        final MdsdDb db = Room.databaseBuilder(
+                getApplicationContext(),
+                MdsdDb.class,
+                "mdsd_db"
+        ).build();
+
+        final StudentEntity student = new StudentEntity("Joe Bloggs", "Any");
+
+        Thread thread = new Thread() {
+            @Override
+            public void run() {
+                // Insert a "dummy" student in the table
+                db.getStudentDao().insertStudent(student);
+                // Read all entries from the table
+                List<StudentEntity> studentList = db.getStudentDao().readAll();
+                // Iterate through the List and composes a Log message
+                StringBuilder stringBuilder = new StringBuilder();
+                for (StudentEntity student : studentList) {
+                    stringBuilder.append(student.toString()).append("\n");
+                }
+                Log.i("student list", stringBuilder.toString());
+            }
+        };
+        thread.start();
     }
 
     private void checkExternalStorageWritePermission() {
@@ -130,7 +170,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else {
             Toast.makeText(this, ":)", Toast.LENGTH_SHORT).show();
         }
-
     }
 
     private void displayCurrentInternalFiles() {
